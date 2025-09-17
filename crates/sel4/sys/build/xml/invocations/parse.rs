@@ -75,6 +75,7 @@ impl Api {
                 _ => {}
             }
         }
+
         Self {
             name: e.attributes.get("name").map(ToOwned::to_owned),
             structs,
@@ -95,7 +96,9 @@ impl Struct {
                     panic!();
                 }
             }
+        
         }
+
         Self {
             name: e.attributes.get("name").unwrap().to_owned(),
             members,

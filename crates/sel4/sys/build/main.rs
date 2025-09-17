@@ -91,7 +91,8 @@ impl OutDir {
     }
 
     fn write_file(&self, toks: TokenStream, filename: impl AsRef<Path>) {
-        let formatted = prettyplease::unparse(&syn::parse2(toks).unwrap());
+        let parse2_result = syn::parse2(toks);
+        let formatted = prettyplease::unparse(&parse2_result.unwrap());
         let out_path = self.path.join(filename);
         fs::write(out_path, formatted).unwrap();
     }

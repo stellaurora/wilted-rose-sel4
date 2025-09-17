@@ -72,6 +72,7 @@ pub fn generate_rust(
         for method in interface.methods.iter() {
             if Condition::eval_option(&method.condition) {
                 let (in_params, out_params) = method.partition_parameters();
+  
                 invocation_generator.generate_invocation(
                     &interface.name,
                     &method.name,
@@ -224,7 +225,7 @@ impl<'a> InvocationGenerator<'a> {
         out_params_passed_by_value: &[&Parameter],
     ) -> TokenStream {
         let ret_struct_fields = out_params_passed_by_value.iter().map(|param| {
-            let name = format_ident!("{}", param.name);
+            let name = format_ident!("r#{}", param.name);
             let ty = format_ident!("{}", param.ty);
             quote! {
                 #name: #ty
@@ -304,7 +305,7 @@ impl<'a> InvocationGenerator<'a> {
                 ParameterType::Primitive {
                     module_enum: false, ..
                 } => {
-                    let name = format_ident!("{}", param.name);
+                    let name = format_ident!("r#{}", param.name);
                     toks.extend(quote! {
                         ret.#name = self.get_mr_bits(#start..#end);
                     })
@@ -313,7 +314,7 @@ impl<'a> InvocationGenerator<'a> {
                     assert!(self.parameter_types.get(&param.ty).pass_by_reference());
                     let name = format_ident!("{}", param.name);
                     for (i, member) in members.iter().enumerate() {
-                        let member = format_ident!("{}", member);
+                        let member = format_ident!("r#{}", member);
                         let member_start = start + i * WORD_SIZE;
                         let member_end = member_start + WORD_SIZE;
                         toks.extend(quote! {

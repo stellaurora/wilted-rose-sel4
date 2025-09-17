@@ -14,6 +14,7 @@ declare_fault_newtype!(CapFault, seL4_Fault_CapFault);
 declare_fault_newtype!(UnknownSyscall, seL4_Fault_UnknownSyscall);
 declare_fault_newtype!(UserException, seL4_Fault_UserException);
 declare_fault_newtype!(VmFault, seL4_Fault_VMFault);
+declare_fault_newtype!(DebugFault, seL4_Fault_DebugException);
 
 #[sel4_cfg(KERNEL_MCS)]
 declare_fault_newtype!(Timeout, seL4_Fault_Timeout);
@@ -35,6 +36,7 @@ pub enum Fault {
     UnknownSyscall(UnknownSyscall),
     UserException(UserException),
     VmFault(VmFault),
+    DebugFault(DebugFault),
     #[sel4_cfg(KERNEL_MCS)]
     Timeout(Timeout),
     #[sel4_cfg(ARM_HYPERVISOR_SUPPORT)]
@@ -73,6 +75,9 @@ impl Fault {
                 #[sel4_cfg(ARM_HYPERVISOR_SUPPORT)]
                 sys::seL4_Fault_Splayed::VPPIEvent(inner) => {
                     Self::VPpiEvent(VPpiEvent::from_inner(inner))
+                }
+                sys::seL4_Fault_Splayed::DebugException(inner) => {
+                    Self::DebugFault(DebugFault::from_inner(inner))
                 }
             }
         }
